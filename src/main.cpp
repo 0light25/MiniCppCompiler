@@ -1,27 +1,17 @@
 #include <iostream>
-#include <fstream>
-#include <string>
+#include "lexer.h"
 
 using namespace std;
 
 int main() {
 
-    ifstream file("examples/program.mc");
+    string code = "int x = 10;";
 
-    if (!file) {
-        cout << "Could not open source file!" << endl;
-        return 1;
+    vector<string> tokens = tokenize(code);
+
+    for (string token : tokens) {
+        cout << token << endl;
     }
-
-    string line;
-
-    cout << "Source Code:" << endl;
-
-    while (getline(file, line)) {
-        cout << line << endl;
-    }
-
-    file.close();
 
     return 0;
 }
