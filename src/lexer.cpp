@@ -1,14 +1,86 @@
 #include "lexer.h"
-#include <sstream>
+#include <cctype>
 
-vector<string> tokenize(string code) {
-    vector<string> tokens;
-    string word;
+vector<Token> Lexer::tokenize(string code) {
 
-    stringstream ss(code);
+    vector<Token> tokens;
 
-    while (ss >> word) {
-        tokens.push_back(word);
+    for (int i = 0; i < code.length(); i++) {
+
+        // Skip spaces
+        if (isspace(code[i])) {
+            continue;
+        }
+
+        // Number
+        if (isdigit(code[i])) {
+
+            string number = "";
+
+            while (i < code.length() && isdigit(code[i])) {
+                number += code[i];
+                i++;
+            }
+
+            i--;
+
+            tokens.push_back({NUMBER, number});
+        }
+
+        // Identifier or keyword
+        else if (isalpha(code[i])) {
+
+            string word = "";
+
+            while (i < code.length() && isalnum(code[i])) {
+                word += code[i];
+                i++;
+            }
+
+            i--;
+
+            if (word == "int" ||
+                word == "float" ||
+                word == "char" ||
+                word == "return") {
+
+                tokens.push_back({KEYWORD, word});
+            }
+            else {
+                tokens.push_back({IDENTIFIER, word});
+            }
+        }
+
+        // Operators
+        else if (code[i] == '+' ||
+                 code[i] == '-' ||
+                 code[i] == '*' ||
+                 code[i] == '/' ||
+                 code[i] == '=') {
+
+            string op(1, code[i]);
+
+            tokens.push_back({OPERATOR, op});
+        }
+
+        // Symbols
+        else if (code[i] == ';' ||
+                 code[i] == '(' ||
+                 code[i] == ')' ||
+                 code[i] == '{' ||
+                 code[i] == '}') {
+
+            string symbol(1, code[i]);
+
+            tokens.push_back({SYMBOL, symbol});
+        }
+
+        // Unknown character
+        else {
+            string unknown(1, code[i]);
+
+            tokens.push_back({UNKNOWN, unknown});
+        }
     }
 
     return tokens;

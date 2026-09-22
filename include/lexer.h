@@ -6,6 +6,23 @@
 
 using namespace std;
 
-vector<string> tokenize(string code);
+enum TokenType {
+    KEYWORD,
+    IDENTIFIER,
+    NUMBER,
+    OPERATOR,
+    SYMBOL,
+    UNKNOWN
+};
+
+struct Token {
+    TokenType type;
+    string value;
+};
+
+class Lexer {
+public:
+    vector<Token> tokenize(string code);
+};
 
 #endif
