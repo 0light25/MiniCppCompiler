@@ -7,7 +7,12 @@ int main() {
 
     Lexer lexer;
 
-    string code = "int x = 10;";
+    string code = R"(
+        int x = 10 + 20;
+        if (x >= 20) {
+            x = x - 5;
+        }
+    )";
 
     vector<Token> tokens = lexer.tokenize(code);
 

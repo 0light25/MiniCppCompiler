@@ -42,7 +42,8 @@ vector<Token> Lexer::tokenize(string code) {
             if (word == "int" ||
                 word == "float" ||
                 word == "char" ||
-                word == "return") {
+                word == "return" ||
+				word == "if" ) {
 
                 tokens.push_back({KEYWORD, word});
             }
@@ -51,24 +52,39 @@ vector<Token> Lexer::tokenize(string code) {
             }
         }
 
-        // Operators
-        else if (code[i] == '+' ||
-                 code[i] == '-' ||
-                 code[i] == '*' ||
-                 code[i] == '/' ||
-                 code[i] == '=') {
+      // Operators
+// Operators
+else if (code[i] == '+' ||
+         code[i] == '-' ||
+         code[i] == '*' ||
+         code[i] == '/' ||
+         code[i] == '=' ||
+         code[i] == '!' ||
+         code[i] == '<' ||
+         code[i] == '>') {
 
-            string op(1, code[i]);
+    string op(1, code[i]);
 
-            tokens.push_back({OPERATOR, op});
-        }
+    // Check for two-character operators
+    if (i + 1 < code.length() &&
+        (code[i + 1] == '=')) {
+
+        op += code[i + 1];
+        i++;
+    }
+
+    tokens.push_back({OPERATOR, op});
+}
 
         // Symbols
         else if (code[i] == ';' ||
-                 code[i] == '(' ||
-                 code[i] == ')' ||
-                 code[i] == '{' ||
-                 code[i] == '}') {
+         code[i] == '(' ||
+         code[i] == ')' ||
+         code[i] == '{' ||
+         code[i] == '}' ||
+         code[i] == '[' ||
+         code[i] == ']' ||
+         code[i] == ',') {
 
             string symbol(1, code[i]);
 
