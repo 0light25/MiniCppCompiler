@@ -1,6 +1,20 @@
 #include "lexer.h"
 #include <cctype>
 
+bool isKeyword(string word) {
+
+    if (word == "int" ||
+        word == "float" ||
+        word == "if" ||
+        word == "else" ||
+        word == "while" ||
+        word == "return") {
+
+        return true;
+    }
+
+    return false;
+}
 vector<Token> Lexer::tokenize(string code) {
 
     vector<Token> tokens;
