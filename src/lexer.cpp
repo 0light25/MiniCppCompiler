@@ -1,19 +1,21 @@
 #include "lexer.h"
 #include <cctype>
+#include <set>
+using namespace std;
 
 bool isKeyword(string word) {
+    set<string> keywords = {
+        "int",
+        "if",
+        "else",
+        "while",
+        "for",
+        "return",
+        "class",
+        "void"
+    };
 
-    if (word == "int" ||
-        word == "float" ||
-        word == "if" ||
-        word == "else" ||
-        word == "while" ||
-        word == "return") {
-
-        return true;
-    }
-
-    return false;
+    return keywords.count(word);
 }
 vector<Token> Lexer::tokenize(string code) {
 
@@ -42,29 +44,35 @@ vector<Token> Lexer::tokenize(string code) {
         }
 
         // Identifier or keyword
-        else if (isalpha(code[i])) {
+        else if (isalpha(code[i]) || code[i] == '_') {
 
-            string word = "";
+    string word = "";
 
-            while (i < code.length() && isalnum(code[i])) {
-                word += code[i];
-                i++;
-            }
+    while (i < code.length() &&
+           (isalnum(code[i]) || code[i] == '_')) {
 
-            i--;
+        word += code[i];
+        i++;
+    }
 
-            if (word == "int" ||
-                word == "float" ||
-                word == "char" ||
-                word == "return" ||
-				word == "if" ) {
+    i--;
 
-                tokens.push_back({KEYWORD, word});
-            }
-            else {
-                tokens.push_back({IDENTIFIER, word});
-            }
-        }
+    if (word == "int" ||
+        word == "float" ||
+        word == "char" ||
+        word == "return" ||
+        word == "if" ||
+        word == "else" ||
+        word == "while" ||
+        word == "for" ||
+        word == "void") {
+
+        tokens.push_back({KEYWORD, word});
+    }
+    else {
+        tokens.push_back({IDENTIFIER, word});
+    }
+}
 
       // Operators
 // Operators
