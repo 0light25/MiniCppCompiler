@@ -74,7 +74,32 @@ vector<Token> Lexer::tokenize(string code) {
     }
 }
 
-      // Operators
+    // Single-line comment
+else if (code[i] == '/' &&
+         i + 1 < code.length() &&
+         code[i + 1] == '/') {
+
+    i += 2;
+
+    while (i < code.length() && code[i] != '\n') {
+        i++;
+    }
+}
+
+// Multi-line comment
+else if (code[i] == '/' &&
+         i + 1 < code.length() &&
+         code[i + 1] == '*') {
+
+    i += 2;
+
+    while (i + 1 < code.length() &&
+           !(code[i] == '*' && code[i + 1] == '/')) {
+        i++;
+    }
+
+    i++;
+}
 // Operators
 else if (code[i] == '+' ||
          code[i] == '-' ||
