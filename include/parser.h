@@ -8,6 +8,7 @@
 using namespace std;
 
 class Parser {
+
 private:
     vector<Token> tokens;
     int position;
@@ -16,6 +17,9 @@ public:
     Parser(vector<Token> tokens);
 
     ASTNode* parseNumber();
+
+    // Day 11
+    ASTNode* parseExpression();
 };
 
 #endif

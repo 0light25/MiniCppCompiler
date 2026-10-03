@@ -1,27 +1,30 @@
 #include <iostream>
 #include "lexer.h"
 #include "parser.h"
-#include "ast.h"
 
 using namespace std;
 
 int main() {
 
-    string code = "10;";
-
     Lexer lexer;
 
+   // string code = "10 + 20;";
+// string code = "10 - 5;";
+string code = "10;";
     vector<Token> tokens = lexer.tokenize(code);
 
     Parser parser(tokens);
 
-    ASTNode* root = parser.parseNumber();
+    ASTNode* root = parser.parseExpression();
+
+    cout << "AST for: " << code << endl;
+    cout << "-------------------" << endl;
 
     if (root != nullptr) {
         root->print();
     }
     else {
-        cout << "Parsing failed" << endl;
+        cout << "Parser error" << endl;
     }
 
     delete root;

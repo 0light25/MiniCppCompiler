@@ -1,11 +1,12 @@
 #include "parser.h"
-#include <cstdlib>
 
 Parser::Parser(vector<Token> tokens) {
     this->tokens = tokens;
     position = 0;
 }
 
+
+// Day 10
 ASTNode* Parser::parseNumber() {
 
     if (position >= tokens.size()) {
@@ -14,14 +15,49 @@ ASTNode* Parser::parseNumber() {
 
     Token token = tokens[position];
 
-    if (token.type == NUMBER) {
+    if (token.type != NUMBER) {
+        return nullptr;
+    }
+
+    position++;
+
+    int value = stoi(token.value);
+
+    return new NumberNode(value);
+}
+
+
+// Day 11
+ASTNode* Parser::parseExpression() {
+
+    // Parse left side
+    ASTNode* left = parseNumber();
+
+    if (left == nullptr) {
+        return nullptr;
+    }
+
+    // Check for operator
+    if (position < tokens.size() &&
+        tokens[position].type == OPERATOR &&
+        (tokens[position].value == "+" ||
+         tokens[position].value == "-")) {
+
+        string op = tokens[position].value;
 
         position++;
 
-        int value = stoi(token.value);
+        // Parse right side
+        ASTNode* right = parseNumber();
 
-        return new NumberNode(value);
+        if (right == nullptr) {
+            return left;
+        }
+
+        // Create BinaryNode
+        return new BinaryNode(op, left, right);
     }
 
-    return nullptr;
+    // Only a number was present
+    return left;
 }
