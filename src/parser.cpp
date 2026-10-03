@@ -1,63 +1,73 @@
 #include "parser.h"
+#include <stdexcept>
 
 Parser::Parser(vector<Token> tokens) {
+
     this->tokens = tokens;
     position = 0;
 }
 
 
-// Day 10
+// Parse numbers
 ASTNode* Parser::parseNumber() {
 
     if (position >= tokens.size()) {
-        return nullptr;
+        throw runtime_error("Expected number");
     }
 
     Token token = tokens[position];
 
     if (token.type != NUMBER) {
-        return nullptr;
+        throw runtime_error("Expected number");
     }
 
     position++;
 
-    int value = stoi(token.value);
-
-    return new NumberNode(value);
+    return new NumberNode(stoi(token.value));
 }
 
 
-// Day 11
-ASTNode* Parser::parseExpression() {
+// Handle * and /
+ASTNode* Parser::parseTerm() {
 
-    // Parse left side
     ASTNode* left = parseNumber();
 
-    if (left == nullptr) {
-        return nullptr;
-    }
-
-    // Check for operator
-    if (position < tokens.size() &&
-        tokens[position].type == OPERATOR &&
-        (tokens[position].value == "+" ||
-         tokens[position].value == "-")) {
+    while (position < tokens.size() &&
+           tokens[position].type == OPERATOR &&
+           (tokens[position].value == "*" ||
+            tokens[position].value == "/")) {
 
         string op = tokens[position].value;
 
         position++;
 
-        // Parse right side
         ASTNode* right = parseNumber();
 
-        if (right == nullptr) {
-            return left;
-        }
-
-        // Create BinaryNode
-        return new BinaryNode(op, left, right);
+        left = new BinaryNode(op, left, right);
     }
 
-    // Only a number was present
+    return left;
+}
+
+
+// Handle + and -
+ASTNode* Parser::parseExpression() {
+
+    ASTNode* left = parseTerm();
+
+    while (position < tokens.size() &&
+           tokens[position].type == OPERATOR &&
+           (tokens[position].value == "+" ||
+            tokens[position].value == "-")) {
+
+        string op = tokens[position].value;
+
+        position++;
+
+        ASTNode* right = parseTerm();
+
+        left = new BinaryNode(op, left, right);
+    }
+
     return left;
 }
