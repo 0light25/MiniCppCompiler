@@ -1,6 +1,4 @@
 #include <iostream>
-#include <vector>
-
 #include "lexer.h"
 #include "parser.h"
 #include "ast.h"
@@ -9,8 +7,8 @@ using namespace std;
 
 int main() {
 
-   // string code = "10 + 20 * 3;";
-string code = "100 - 20 / 4;";
+    string code = "10 + 20 * 3;";
+
     Lexer lexer;
 
     vector<Token> tokens = lexer.tokenize(code);
@@ -19,11 +17,12 @@ string code = "100 - 20 / 4;";
 
     ASTNode* root = parser.parseExpression();
 
-    cout << "AST:" << endl;
+    if (root != nullptr) {
 
-    root->print();
+        root->print();
 
-    delete root;
+        delete root;
+    }
 
     return 0;
 }

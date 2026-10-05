@@ -13,12 +13,11 @@ private:
     vector<Token> tokens;
     int position;
 
-    ASTNode* parseNumber();
-    ASTNode* parseTerm();
-
 public:
     Parser(vector<Token> tokens);
 
+    ASTNode* parseNumber();
+    ASTNode* parseTerm();
     ASTNode* parseExpression();
 };
 
