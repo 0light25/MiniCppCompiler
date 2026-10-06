@@ -7,7 +7,7 @@ using namespace std;
 
 int main() {
 
-    string code = "10 + 20 * 3;";
+    string code = "(10 + 20) * 3;";
 
     Lexer lexer;
 
