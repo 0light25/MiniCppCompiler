@@ -6,16 +6,14 @@
 
 using namespace std;
 
-// Base class for all AST nodes
 class ASTNode {
 public:
     virtual void print(int indent = 0) = 0;
-
     virtual ~ASTNode() {}
 };
 
 
-// Represents a number such as 10, 20, 100
+// Number node
 class NumberNode : public ASTNode {
 private:
     int value;
@@ -23,13 +21,11 @@ private:
 public:
     NumberNode(int value);
 
-    void print(int indent = 0);
+    void print(int indent = 0) override;
 };
 
 
-// Represents binary expressions such as:
-// 10 + 20
-// x * 5
+// Binary operation node
 class BinaryNode : public ASTNode {
 private:
     string op;
@@ -39,7 +35,29 @@ private:
 public:
     BinaryNode(string op, ASTNode* left, ASTNode* right);
 
-    void print(int indent = 0);
+    void print(int indent = 0) override;
+
+    ~BinaryNode();
+};
+
+
+// Variable declaration node
+class VariableDeclarationNode : public ASTNode {
+private:
+    string type;
+    string name;
+    ASTNode* value;
+
+public:
+    VariableDeclarationNode(
+        string type,
+        string name,
+        ASTNode* value
+    );
+
+    void print(int indent = 0) override;
+
+    ~VariableDeclarationNode();
 };
 
 #endif

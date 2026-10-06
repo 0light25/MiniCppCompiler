@@ -1,13 +1,13 @@
 #include <iostream>
+
 #include "lexer.h"
 #include "parser.h"
-#include "ast.h"
 
 using namespace std;
 
 int main() {
 
-    string code = "(10 + 20) * 3;";
+    string code = "int x = 10 + 20 * 3;";
 
     Lexer lexer;
 
@@ -15,9 +15,11 @@ int main() {
 
     Parser parser(tokens);
 
-    ASTNode* root = parser.parseExpression();
+    ASTNode* root = parser.parseDeclaration();
 
     if (root != nullptr) {
+
+        cout << "AST:" << endl;
 
         root->print();
 

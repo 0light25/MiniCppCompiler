@@ -110,3 +110,68 @@ ASTNode* Parser::parseExpression() {
 
     return left;
 }
+
+ASTNode* Parser::parseDeclaration() {
+
+    // Check data type
+    if (position >= tokens.size() ||
+        tokens[position].type != KEYWORD) {
+
+        cout << "Error: Expected data type" << endl;
+        return nullptr;
+    }
+
+    string type = tokens[position].value;
+    position++;
+
+
+    // Check variable name
+    if (position >= tokens.size() ||
+        tokens[position].type != IDENTIFIER) {
+
+        cout << "Error: Expected variable name" << endl;
+        return nullptr;
+    }
+
+    string name = tokens[position].value;
+    position++;
+
+
+    // Check =
+    if (position >= tokens.size() ||
+        tokens[position].value != "=") {
+
+        cout << "Error: Expected =" << endl;
+        return nullptr;
+    }
+
+    position++;
+
+
+    // Parse expression
+    ASTNode* value = parseExpression();
+
+    if (value == nullptr) {
+        return nullptr;
+    }
+
+
+    // Check ;
+    if (position >= tokens.size() ||
+        tokens[position].value != ";") {
+
+        cout << "Error: Expected ;" << endl;
+
+        delete value;
+        return nullptr;
+    }
+
+    position++;
+
+
+    return new VariableDeclarationNode(
+        type,
+        name,
+        value
+    );
+}

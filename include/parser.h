@@ -16,10 +16,11 @@ private:
     ASTNode* parseNumber();
     ASTNode* parseFactor();
     ASTNode* parseTerm();
+ //   ASTNode* parseDeclaration();
 
 public:
     Parser(vector<Token> tokens);
-
+ ASTNode* parseDeclaration();
     ASTNode* parseExpression();
 };
 
