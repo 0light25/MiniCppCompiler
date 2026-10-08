@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -12,52 +13,49 @@ public:
     virtual ~ASTNode() {}
 };
 
-
-// Number node
 class NumberNode : public ASTNode {
-private:
+public:
     int value;
 
-public:
     NumberNode(int value);
-
-    void print(int indent = 0) override;
+    void print(int indent = 0);
 };
 
-
-// Binary operation node
 class BinaryNode : public ASTNode {
-private:
+public:
     string op;
     ASTNode* left;
     ASTNode* right;
 
-public:
     BinaryNode(string op, ASTNode* left, ASTNode* right);
-
-    void print(int indent = 0) override;
-
+    void print(int indent = 0);
     ~BinaryNode();
 };
 
-
-// Variable declaration node
 class VariableDeclarationNode : public ASTNode {
-private:
+public:
     string type;
     string name;
     ASTNode* value;
 
-public:
     VariableDeclarationNode(
         string type,
         string name,
         ASTNode* value
     );
 
-    void print(int indent = 0) override;
-
+    void print(int indent = 0);
     ~VariableDeclarationNode();
+};
+
+// New for Day 15
+class ProgramNode : public ASTNode {
+public:
+    vector<ASTNode*> statements;
+
+    void addStatement(ASTNode* statement);
+    void print(int indent = 0);
+    ~ProgramNode();
 };
 
 #endif

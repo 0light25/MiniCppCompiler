@@ -10,18 +10,23 @@ using namespace std;
 class Parser {
 
 private:
+
     vector<Token> tokens;
     int position;
 
-    ASTNode* parseNumber();
-    ASTNode* parseFactor();
+    ASTNode* parseExpression();
     ASTNode* parseTerm();
- //   ASTNode* parseDeclaration();
+    ASTNode* parseFactor();
+    ASTNode* parseNumber();
 
 public:
+
     Parser(vector<Token> tokens);
- ASTNode* parseDeclaration();
-    ASTNode* parseExpression();
+
+    ASTNode* parseDeclaration();
+
+    // DAY 15
+    ASTNode* parseProgram();
 };
 
 #endif

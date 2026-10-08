@@ -1,25 +1,16 @@
 #include "ast.h"
 
-
-// NumberNode
 NumberNode::NumberNode(int value) {
     this->value = value;
 }
 
 void NumberNode::print(int indent) {
-
-    for (int i = 0; i < indent; i++)
-        cout << "  ";
-
-    cout << "Number: " << value << endl;
+    cout << string(indent * 2, ' ')
+         << "Number: " << value << endl;
 }
 
-
-// BinaryNode
 BinaryNode::BinaryNode(
-    string op,
-    ASTNode* left,
-    ASTNode* right
+    string op, ASTNode* left, ASTNode* right
 ) {
     this->op = op;
     this->left = left;
@@ -27,11 +18,8 @@ BinaryNode::BinaryNode(
 }
 
 void BinaryNode::print(int indent) {
-
-    for (int i = 0; i < indent; i++)
-        cout << "  ";
-
-    cout << "BinaryOperator: " << op << endl;
+    cout << string(indent * 2, ' ')
+         << "BinaryOperator: " << op << endl;
 
     if (left)
         left->print(indent + 1);
@@ -45,12 +33,8 @@ BinaryNode::~BinaryNode() {
     delete right;
 }
 
-
-// VariableDeclarationNode
 VariableDeclarationNode::VariableDeclarationNode(
-    string type,
-    string name,
-    ASTNode* value
+    string type, string name, ASTNode* value
 ) {
     this->type = type;
     this->name = name;
@@ -58,14 +42,9 @@ VariableDeclarationNode::VariableDeclarationNode(
 }
 
 void VariableDeclarationNode::print(int indent) {
-
-    for (int i = 0; i < indent; i++)
-        cout << "  ";
-
-    cout << "VariableDeclaration: "
-         << type << " "
-         << name
-         << endl;
+    cout << string(indent * 2, ' ')
+         << "VariableDeclaration: "
+         << type << " " << name << endl;
 
     if (value)
         value->print(indent + 1);
@@ -73,4 +52,25 @@ void VariableDeclarationNode::print(int indent) {
 
 VariableDeclarationNode::~VariableDeclarationNode() {
     delete value;
+}
+
+// Day 15
+void ProgramNode::addStatement(ASTNode* statement) {
+    statements.push_back(statement);
+}
+
+void ProgramNode::print(int indent) {
+    cout << string(indent * 2, ' ')
+         << "Program" << endl;
+
+    for (ASTNode* statement : statements) {
+        if (statement)
+            statement->print(indent + 1);
+    }
+}
+
+ProgramNode::~ProgramNode() {
+    for (ASTNode* statement : statements) {
+        delete statement;
+    }
 }

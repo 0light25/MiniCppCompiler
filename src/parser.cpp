@@ -8,6 +8,25 @@ Parser::Parser(vector<Token> tokens) {
     position = 0;
 }
 
+ASTNode* Parser::parseProgram() {
+
+    ProgramNode* program = new ProgramNode();
+
+    while (position < tokens.size()) {
+
+        ASTNode* statement = parseDeclaration();
+
+        if (statement != nullptr) {
+            program->addStatement(statement);
+        }
+        else {
+            cout << "Error: Unable to parse statement" << endl;
+            break;
+        }
+    }
+
+    return program;
+}
 
 // Parse a number
 ASTNode* Parser::parseNumber() {
