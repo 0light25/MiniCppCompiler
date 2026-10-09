@@ -6,16 +6,14 @@
 using namespace std;
 
 int main() {
+string code = R"(
+    int x = 10;
+    x = x + 5;
 
-    string code = R"(
+    int y = 20;
+    y = y * 2;
+)";
 
-        int x = 10;
-
-        int y = 20 + 30;
-
-        int z = (10 + 20) * 3;
-
-    )";
 
     Lexer lexer;
 

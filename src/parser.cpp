@@ -1,26 +1,59 @@
+
 #include "parser.h"
 #include <iostream>
+#include <stdexcept>
 
 using namespace std;
 
+// Constructor
 Parser::Parser(vector<Token> tokens) {
     this->tokens = tokens;
     position = 0;
 }
 
+
+// Parse complete program
 ASTNode* Parser::parseProgram() {
 
     ProgramNode* program = new ProgramNode();
 
     while (position < tokens.size()) {
 
-        ASTNode* statement = parseDeclaration();
+        ASTNode* statement = nullptr;
 
-        if (statement != nullptr) {
-            program->addStatement(statement);
+        try {
+
+            // Variable declaration
+            if (tokens[position].value == "int" ||
+                tokens[position].value == "float" ||
+                tokens[position].value == "char") {
+
+                statement = parseDeclaration();
+            }
+
+            // Assignment statement
+            else if (tokens[position].type == IDENTIFIER) {
+
+                statement = parseAssignment();
+            }
+
+            else {
+                cout << "Error: Unexpected token: "
+                     << tokens[position].value << endl;
+                break;
+            }
+
+            if (statement != nullptr) {
+                program->addStatement(statement);
+            }
+            else {
+                cout << "Error: Unable to parse statement" << endl;
+                break;
+            }
+
         }
-        else {
-            cout << "Error: Unable to parse statement" << endl;
+        catch (const exception& e) {
+            cout << "Error: " << e.what() << endl;
             break;
         }
     }
@@ -28,7 +61,51 @@ ASTNode* Parser::parseProgram() {
     return program;
 }
 
-// Parse a number
+
+// Parse assignment statement
+// Example: x = x + 5;
+ASTNode* Parser::parseAssignment() {
+
+    if (position >= tokens.size() ||
+        tokens[position].type != IDENTIFIER) {
+
+        throw runtime_error("Expected variable name");
+    }
+
+    string variableName = tokens[position].value;
+    position++;
+
+    // Check =
+    if (position >= tokens.size() ||
+        tokens[position].value != "=") {
+
+        throw runtime_error("Expected =");
+    }
+
+    position++;
+
+    // Parse right-hand side expression
+    ASTNode* expression = parseExpression();
+
+    if (expression == nullptr) {
+        throw runtime_error("Invalid assignment expression");
+    }
+
+    // Check ;
+    if (position >= tokens.size() ||
+        tokens[position].value != ";") {
+
+        delete expression;
+        throw runtime_error("Expected ;");
+    }
+
+    position++;
+
+    return new AssignmentNode(variableName, expression);
+}
+
+
+// Parse number
 ASTNode* Parser::parseNumber() {
 
     if (position >= tokens.size()) {
@@ -48,36 +125,46 @@ ASTNode* Parser::parseNumber() {
 }
 
 
-// Parse number OR parentheses
+// Parse number, identifier, or parentheses
 ASTNode* Parser::parseFactor() {
 
     if (position >= tokens.size()) {
         return nullptr;
     }
 
-    // Normal number
+    // Number
     if (tokens[position].type == NUMBER) {
+
         return parseNumber();
+    }
+
+    // Identifier
+    if (tokens[position].type == IDENTIFIER) {
+
+        string name = tokens[position].value;
+        position++;
+
+        return new IdentifierNode(name);
     }
 
     // Parentheses
     if (tokens[position].value == "(") {
 
-        // Skip '('
+        // Skip (
         position++;
 
-        // Parse expression inside parentheses
         ASTNode* node = parseExpression();
 
-        // Check for ')'
+        // Check )
         if (position < tokens.size() &&
             tokens[position].value == ")") {
 
-            // Skip ')'
             position++;
         }
         else {
             cout << "Error: Expected )" << endl;
+            delete node;
+            return nullptr;
         }
 
         return node;
@@ -87,10 +174,14 @@ ASTNode* Parser::parseFactor() {
 }
 
 
-// Handle * and /
+// Handle multiplication and division
 ASTNode* Parser::parseTerm() {
 
     ASTNode* left = parseFactor();
+
+    if (left == nullptr) {
+        return nullptr;
+    }
 
     while (position < tokens.size() &&
           (tokens[position].value == "*" ||
@@ -102,6 +193,11 @@ ASTNode* Parser::parseTerm() {
 
         ASTNode* right = parseFactor();
 
+        if (right == nullptr) {
+            delete left;
+            return nullptr;
+        }
+
         left = new BinaryNode(op, left, right);
     }
 
@@ -109,10 +205,14 @@ ASTNode* Parser::parseTerm() {
 }
 
 
-// Handle + and -
+// Handle addition and subtraction
 ASTNode* Parser::parseExpression() {
 
     ASTNode* left = parseTerm();
+
+    if (left == nullptr) {
+        return nullptr;
+    }
 
     while (position < tokens.size() &&
           (tokens[position].value == "+" ||
@@ -124,12 +224,20 @@ ASTNode* Parser::parseExpression() {
 
         ASTNode* right = parseTerm();
 
+        if (right == nullptr) {
+            delete left;
+            return nullptr;
+        }
+
         left = new BinaryNode(op, left, right);
     }
 
     return left;
 }
 
+
+// Parse variable declaration
+// Example: int x = 10;
 ASTNode* Parser::parseDeclaration() {
 
     // Check data type
@@ -143,7 +251,6 @@ ASTNode* Parser::parseDeclaration() {
     string type = tokens[position].value;
     position++;
 
-
     // Check variable name
     if (position >= tokens.size() ||
         tokens[position].type != IDENTIFIER) {
@@ -155,7 +262,6 @@ ASTNode* Parser::parseDeclaration() {
     string name = tokens[position].value;
     position++;
 
-
     // Check =
     if (position >= tokens.size() ||
         tokens[position].value != "=") {
@@ -166,14 +272,13 @@ ASTNode* Parser::parseDeclaration() {
 
     position++;
 
-
     // Parse expression
     ASTNode* value = parseExpression();
 
     if (value == nullptr) {
+        cout << "Error: Invalid expression" << endl;
         return nullptr;
     }
-
 
     // Check ;
     if (position >= tokens.size() ||
@@ -187,10 +292,10 @@ ASTNode* Parser::parseDeclaration() {
 
     position++;
 
-
     return new VariableDeclarationNode(
         type,
         name,
         value
     );
 }
+

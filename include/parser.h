@@ -13,7 +13,7 @@ private:
 
     vector<Token> tokens;
     int position;
-
+    ASTNode* parseAssignment();
     ASTNode* parseExpression();
     ASTNode* parseTerm();
     ASTNode* parseFactor();

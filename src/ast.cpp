@@ -74,3 +74,32 @@ ProgramNode::~ProgramNode() {
         delete statement;
     }
 }
+
+IdentifierNode::IdentifierNode(string name) {
+    this->name = name;
+}
+
+void IdentifierNode::print(int indent) {
+    cout << string(indent, ' ')
+         << "Identifier: " << name << endl;
+}
+
+AssignmentNode::AssignmentNode(
+    string name, ASTNode* expression
+) {
+    this->name = name;
+    this->expression = expression;
+}
+
+AssignmentNode::~AssignmentNode() {
+    delete expression;
+}
+
+void AssignmentNode::print(int indent) {
+    cout << string(indent, ' ')
+         << "Assignment: " << name << endl;
+
+    if (expression != nullptr) {
+        expression->print(indent + 2);
+    }
+}

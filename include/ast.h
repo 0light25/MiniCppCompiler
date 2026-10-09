@@ -57,5 +57,25 @@ public:
     void print(int indent = 0);
     ~ProgramNode();
 };
+class IdentifierNode : public ASTNode {
+public:
+    string name;
+
+    IdentifierNode(string name);
+
+    void print(int indent = 0) override;
+};
+
+class AssignmentNode : public ASTNode {
+public:
+    string name;
+    ASTNode* expression;
+
+    AssignmentNode(string name, ASTNode* expression);
+
+    ~AssignmentNode();
+
+    void print(int indent = 0) override;
+};
 
 #endif
