@@ -103,3 +103,32 @@ void AssignmentNode::print(int indent) {
         expression->print(indent + 2);
     }
 }
+
+// Constructor
+IfNode::IfNode(ASTNode* condition, ProgramNode* body) {
+    this->condition = condition;
+    this->body = body;
+}
+
+// Destructor
+IfNode::~IfNode() {
+    delete condition;
+    delete body;
+}
+
+// Print the If AST
+void IfNode::print(int indent) {
+
+    cout << string(indent * 2, ' ')
+         << "IfStatement" << endl;
+
+    cout << string((indent + 1) * 2, ' ')
+         << "Condition:" << endl;
+
+    condition->print(indent + 2);
+
+    cout << string((indent + 1) * 2, ' ')
+         << "Body:" << endl;
+
+    body->print(indent + 2);
+}

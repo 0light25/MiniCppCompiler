@@ -1,5 +1,6 @@
 
 #include "parser.h"
+#include <string>
 #include <iostream>
 #include <stdexcept>
 
@@ -13,54 +14,20 @@ Parser::Parser(vector<Token> tokens) {
 
 
 // Parse complete program
+
 ASTNode* Parser::parseProgram() {
 
     ProgramNode* program = new ProgramNode();
 
     while (position < tokens.size()) {
 
-        ASTNode* statement = nullptr;
+        ASTNode* statement = parseStatement();
 
-        try {
-
-            // Variable declaration
-            if (tokens[position].value == "int" ||
-                tokens[position].value == "float" ||
-                tokens[position].value == "char") {
-
-                statement = parseDeclaration();
-            }
-
-            // Assignment statement
-            else if (tokens[position].type == IDENTIFIER) {
-
-                statement = parseAssignment();
-            }
-
-            else {
-                cout << "Error: Unexpected token: "
-                     << tokens[position].value << endl;
-                break;
-            }
-
-            if (statement != nullptr) {
-                program->addStatement(statement);
-            }
-            else {
-                cout << "Error: Unable to parse statement" << endl;
-                break;
-            }
-
-        }
-        catch (const exception& e) {
-            cout << "Error: " << e.what() << endl;
-            break;
-        }
+        program->addStatement(statement);
     }
 
     return program;
 }
-
 
 // Parse assignment statement
 // Example: x = x + 5;
@@ -296,6 +263,108 @@ ASTNode* Parser::parseDeclaration() {
         type,
         name,
         value
+    );
+}
+
+void Parser::expect(const string& value) {
+
+    if (position >= tokens.size() ||
+        tokens[position].value != value) {
+
+        throw runtime_error("Expected '" + value + "'");
+    }
+
+    position++;
+}
+
+ASTNode* Parser::parseCondition() {
+
+    // Parse left-hand expression
+    ASTNode* left = parseExpression();
+
+    // Check comparison operator
+    if (position >= tokens.size() ||
+        (tokens[position].value != ">" &&
+         tokens[position].value != "<")) {
+
+        delete left;
+
+        throw runtime_error(
+            "Expected comparison operator > or <"
+        );
+    }
+
+    string op = tokens[position].value;
+    position++;
+
+    // Parse right-hand expression
+    ASTNode* right = parseExpression();
+
+    return new BinaryNode(op, left, right);
+}
+ASTNode* Parser::parseIfStatement() {
+
+    // Expect if
+    expect("if");
+
+    // Expect (
+    expect("(");
+
+    // Parse condition
+    ASTNode* condition = parseCondition();
+
+    // Expect )
+    expect(")");
+
+    // Expect {
+    expect("{");
+
+    // Create body
+    ProgramNode* body = new ProgramNode();
+
+    // Parse statements inside if block
+    while (position < tokens.size() &&
+           tokens[position].value != "}") {
+
+        ASTNode* statement = parseStatement();
+
+        body->addStatement(statement);
+    }
+
+    // Expect }
+    expect("}");
+
+    // Create IfNode
+    return new IfNode(condition, body);
+}
+ASTNode* Parser::parseStatement() {
+
+    if (position >= tokens.size()) {
+        throw runtime_error("Expected statement");
+    }
+
+    string value = tokens[position].value;
+
+    // If statement
+    if (value == "if") {
+        return parseIfStatement();
+    }
+
+    // Variable declaration
+    if (value == "int" ||
+        value == "float" ||
+        value == "char") {
+
+        return parseDeclaration();
+    }
+
+    // Assignment
+    if (tokens[position].type == IDENTIFIER) {
+        return parseAssignment();
+    }
+
+    throw runtime_error(
+        "Unexpected token: " + value
     );
 }
 

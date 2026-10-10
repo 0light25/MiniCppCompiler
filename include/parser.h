@@ -18,7 +18,13 @@ private:
     ASTNode* parseTerm();
     ASTNode* parseFactor();
     ASTNode* parseNumber();
+ASTNode* parseCondition();
 
+ASTNode* parseIfStatement();
+
+ASTNode* parseStatement();
+
+void expect(const string& value);
 public:
 
     Parser(vector<Token> tokens);
