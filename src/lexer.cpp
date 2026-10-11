@@ -101,28 +101,37 @@ else if (code[i] == '/' &&
     i++;
 }
 // Operators
+// Operators
 else if (code[i] == '+' ||
          code[i] == '-' ||
          code[i] == '*' ||
          code[i] == '/' ||
          code[i] == '=' ||
-         code[i] == '!' ||
          code[i] == '<' ||
-         code[i] == '>') {
+         code[i] == '>' ||
+         code[i] == '!') {
 
     string op(1, code[i]);
 
-    // Check for two-character operators
+    // Check two-character operators
     if (i + 1 < code.length() &&
-        (code[i + 1] == '=')) {
+        code[i + 1] == '=' &&
+        (code[i] == '>' ||
+         code[i] == '<' ||
+         code[i] == '=' ||
+         code[i] == '!')) {
 
-        op += code[i + 1];
+        op += '=';
         i++;
     }
 
-    tokens.push_back({OPERATOR, op});
+    if (op == "!") {
+        tokens.push_back({UNKNOWN, op});
+    }
+    else {
+        tokens.push_back({OPERATOR, op});
+    }
 }
-
         // Symbols
         else if (code[i] == ';' ||
          code[i] == '(' ||

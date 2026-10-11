@@ -10,15 +10,21 @@ int main() {
 
         int x = 10;
 
-        x = x + 5;
+        if (x >= 10) {
+            x = x + 1;
+        }
 
-        int y = 20;
+        if (x <= 20) {
+            x = x + 2;
+        }
 
-        y = y * 2;
+        if (x == 13) {
+            x = x + 3;
+        }
 
-       if (y < 50) {
-    y = y + 10;
-}
+        if (x != 0) {
+            x = x * 2;
+        }
 
     )";
 
@@ -26,11 +32,13 @@ int main() {
 
         Lexer lexer;
 
-        vector<Token> tokens = lexer.tokenize(code);
+        vector<Token> tokens =
+            lexer.tokenize(code);
 
         Parser parser(tokens);
 
-        ASTNode* root = parser.parseProgram();
+        ASTNode* root =
+            parser.parseProgram();
 
         root->print();
 
@@ -39,8 +47,9 @@ int main() {
     }
     catch (const exception& e) {
 
-        cerr << "Parser error: "
-             << e.what() << endl;
+        cerr << "Parser Error: "
+             << e.what()
+             << endl;
 
         return 1;
     }

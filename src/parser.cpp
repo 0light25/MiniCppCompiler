@@ -279,29 +279,43 @@ void Parser::expect(const string& value) {
 
 ASTNode* Parser::parseCondition() {
 
-    // Parse left-hand expression
+    // Parse left expression
     ASTNode* left = parseExpression();
 
-    // Check comparison operator
-    if (position >= tokens.size() ||
-        (tokens[position].value != ">" &&
-         tokens[position].value != "<")) {
-
+    // Check operator
+    if (position >= tokens.size()) {
         delete left;
-
         throw runtime_error(
-            "Expected comparison operator > or <"
+            "Expected comparison operator"
         );
     }
 
     string op = tokens[position].value;
+
+    // Supported operators
+    if (op != ">" &&
+        op != "<" &&
+        op != ">=" &&
+        op != "<=" &&
+        op != "==" &&
+        op != "!=") {
+
+        delete left;
+
+        throw runtime_error(
+            "Invalid comparison operator"
+        );
+    }
+
     position++;
 
-    // Parse right-hand expression
+    // Parse right expression
     ASTNode* right = parseExpression();
 
+    // Construct comparison AST
     return new BinaryNode(op, left, right);
 }
+
 ASTNode* Parser::parseIfStatement() {
 
     // Expect if
