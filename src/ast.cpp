@@ -104,19 +104,21 @@ void AssignmentNode::print(int indent) {
     }
 }
 
-// Constructor
-IfNode::IfNode(ASTNode* condition, ProgramNode* body) {
+
+IfNode::IfNode(ASTNode* condition,
+               ProgramNode* body,
+               ProgramNode* elseBody) {
     this->condition = condition;
     this->body = body;
+    this->elseBody = elseBody;
 }
 
-// Destructor
 IfNode::~IfNode() {
     delete condition;
     delete body;
+    delete elseBody;
 }
 
-// Print the If AST
 void IfNode::print(int indent) {
 
     cout << string(indent * 2, ' ')
@@ -128,7 +130,16 @@ void IfNode::print(int indent) {
     condition->print(indent + 2);
 
     cout << string((indent + 1) * 2, ' ')
-         << "Body:" << endl;
+         << "Then:" << endl;
 
     body->print(indent + 2);
+
+    if (elseBody != nullptr) {
+
+        cout << string((indent + 1) * 2, ' ')
+             << "Else:" << endl;
+
+        elseBody->print(indent + 2);
+    }
 }
+

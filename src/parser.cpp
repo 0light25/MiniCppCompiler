@@ -316,41 +316,57 @@ ASTNode* Parser::parseCondition() {
     return new BinaryNode(op, left, right);
 }
 
+
 ASTNode* Parser::parseIfStatement() {
 
-    // Expect if
+    // Step 1: Expect if (
     expect("if");
-
-    // Expect (
     expect("(");
 
-    // Parse condition
+    // Step 2: Parse condition
     ASTNode* condition = parseCondition();
 
-    // Expect )
     expect(")");
 
-    // Expect {
+    // Step 3: Parse if body
     expect("{");
 
-    // Create body
     ProgramNode* body = new ProgramNode();
 
-    // Parse statements inside if block
     while (position < tokens.size() &&
            tokens[position].value != "}") {
 
         ASTNode* statement = parseStatement();
-
         body->addStatement(statement);
     }
 
-    // Expect }
     expect("}");
 
-    // Create IfNode
-    return new IfNode(condition, body);
+    // Step 4: Check for optional else
+    ProgramNode* elseBody = nullptr;
+
+    if (position < tokens.size() &&
+        tokens[position].value == "else") {
+
+        expect("else");
+        expect("{");
+
+        elseBody = new ProgramNode();
+
+        while (position < tokens.size() &&
+               tokens[position].value != "}") {
+
+            ASTNode* statement = parseStatement();
+            elseBody->addStatement(statement);
+        }
+
+        expect("}");
+    }
+
+    // Step 5: Create AST node
+    return new IfNode(condition, body, elseBody);
 }
+
 ASTNode* Parser::parseStatement() {
 
     if (position >= tokens.size()) {

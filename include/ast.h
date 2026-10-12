@@ -78,14 +78,17 @@ public:
     void print(int indent = 0) override;
 };
 
-class IfNode : public ASTNode {
 
+class IfNode : public ASTNode {
 private:
     ASTNode* condition;
     ProgramNode* body;
+    ProgramNode* elseBody;
 
 public:
-    IfNode(ASTNode* condition, ProgramNode* body);
+    IfNode(ASTNode* condition,
+           ProgramNode* body,
+           ProgramNode* elseBody = nullptr);
 
     ~IfNode() override;
 
