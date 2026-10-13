@@ -370,31 +370,84 @@ ASTNode* Parser::parseIfStatement() {
 ASTNode* Parser::parseStatement() {
 
     if (position >= tokens.size()) {
-        throw runtime_error("Expected statement");
+        throw runtime_error("Unexpected end of input");
     }
 
-    string value = tokens[position].value;
-
-    // If statement
-    if (value == "if") {
-        return parseIfStatement();
-    }
-
-    // Variable declaration
-    if (value == "int" ||
-        value == "float" ||
-        value == "char") {
-
+    if (tokens[position].value == "int") {
         return parseDeclaration();
     }
 
-    // Assignment
+    if (tokens[position].value == "if") {
+        return parseIfStatement();
+    }
+
+    // DAY 20 - ADD THIS
+    if (tokens[position].value == "while") {
+        return parseWhileStatement();
+    }
+
     if (tokens[position].type == IDENTIFIER) {
         return parseAssignment();
     }
 
     throw runtime_error(
-        "Unexpected token: " + value
+        "Unexpected token: " + tokens[position].value
     );
 }
 
+ASTNode* Parser::parseWhileStatement() {
+
+    // Expect while
+    if (position >= tokens.size() ||
+        tokens[position].value != "while") {
+        throw runtime_error("Expected while");
+    }
+
+    position++;
+
+    // Expect (
+    if (position >= tokens.size() ||
+        tokens[position].value != "(") {
+        throw runtime_error("Expected ( after while");
+    }
+
+    position++;
+
+    // Parse condition
+    ASTNode* condition = parseCondition();
+
+    // Expect )
+    if (position >= tokens.size() ||
+        tokens[position].value != ")") {
+        throw runtime_error("Expected ) after condition");
+    }
+
+    position++;
+
+    // Expect {
+    if (position >= tokens.size() ||
+        tokens[position].value != "{") {
+        throw runtime_error("Expected { after while");
+    }
+
+    position++;
+
+    ProgramNode* body = new ProgramNode();
+
+    // Parse statements inside while
+    while (position < tokens.size() &&
+           tokens[position].value != "}") {
+
+        body->addStatement(parseStatement());
+    }
+
+    // Expect }
+    if (position >= tokens.size() ||
+        tokens[position].value != "}") {
+        throw runtime_error("Expected } after while body");
+    }
+
+    position++;
+
+    return new WhileNode(condition, body);
+}

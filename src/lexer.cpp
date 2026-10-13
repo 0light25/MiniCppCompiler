@@ -65,7 +65,8 @@ vector<Token> Lexer::tokenize(string code) {
         word == "else" ||
         word == "while" ||
         word == "for" ||
-        word == "void") {
+        word == "void" ||
+		word == "while") {
 
         tokens.push_back({KEYWORD, word});
     }

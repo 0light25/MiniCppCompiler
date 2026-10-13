@@ -21,7 +21,7 @@ private:
 ASTNode* parseCondition();
 
 ASTNode* parseIfStatement();
-
+ASTNode* parseWhileStatement();
 ASTNode* parseStatement();
 
 void expect(const string& value);

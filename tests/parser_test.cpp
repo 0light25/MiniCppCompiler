@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include "lexer.h"
 #include "parser.h"
@@ -9,35 +8,24 @@ using namespace std;
 int main() {
 
     string code = R"(
-  int x = 3;
-if (x == 0) {
-    x = 1;
-} else {
-    x = x + 2;
-    x = x * 3;
-}
+        int x = 0;
+
+        while (x < 5) {
+            x = x + 1;
+        }
     )";
 
-    try {
-        Lexer lexer;
+    Lexer lexer;
 
-        vector<Token> tokens = lexer.tokenize(code);
+    vector<Token> tokens = lexer.tokenize(code);
 
-        Parser parser(tokens);
+    Parser parser(tokens);
 
-        ASTNode* root = parser.parseProgram();
+    ASTNode* root = parser.parseProgram();
 
-        root->print();
+    root->print();
 
-        delete root;
-    }
-    catch (const exception& e) {
-        cerr << "Parser Error: "
-             << e.what() << endl;
-
-        return 1;
-    }
+    delete root;
 
     return 0;
 }
-

@@ -94,4 +94,15 @@ public:
 
     void print(int indent = 0) override;
 };
+class WhileNode : public ASTNode {
+public:
+    ASTNode* condition;
+    ProgramNode* body;
+
+    WhileNode(ASTNode* condition, ProgramNode* body);
+
+    void print(int indent = 0) override;
+
+    ~WhileNode();
+};
 #endif
