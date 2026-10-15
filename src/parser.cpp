@@ -96,50 +96,45 @@ ASTNode* Parser::parseNumber() {
 ASTNode* Parser::parseFactor() {
 
     if (position >= tokens.size()) {
-        return nullptr;
+        throw runtime_error(
+            "Syntax Error: Expected expression "
+            "but reached end of input"
+        );
     }
+
+    Token token = tokens[position];
 
     // Number
-    if (tokens[position].type == NUMBER) {
-
-        return parseNumber();
-    }
-
-    // Identifier
-    if (tokens[position].type == IDENTIFIER) {
-
-        string name = tokens[position].value;
+    if (token.type == NUMBER) {
         position++;
+       // return new NumberNode(token.value);
+    return new NumberNode(stoi(token.value));
+	}
 
-        return new IdentifierNode(name);
+    // Variable
+    if (token.type == IDENTIFIER) {
+        position++;
+        return new IdentifierNode(token.value);
     }
 
     // Parentheses
-    if (tokens[position].value == "(") {
-
-        // Skip (
+    if (token.value == "(") {
         position++;
 
         ASTNode* node = parseExpression();
 
-        // Check )
-        if (position < tokens.size() &&
-            tokens[position].value == ")") {
-
-            position++;
-        }
-        else {
-            cout << "Error: Expected )" << endl;
-            delete node;
-            return nullptr;
-        }
+        expect(")");
 
         return node;
     }
 
-    return nullptr;
+    throw runtime_error(
+        "Syntax Error at token " +
+        to_string(position + 1) +
+        ": Expected expression but found '" +
+        token.value + "'"
+    );
 }
-
 
 // Handle multiplication and division
 ASTNode* Parser::parseTerm() {
@@ -249,13 +244,14 @@ ASTNode* Parser::parseDeclaration() {
 
     // Check ;
     if (position >= tokens.size() ||
-        tokens[position].value != ";") {
+    tokens[position].value != ";") {
 
-        cout << "Error: Expected ;" << endl;
+    delete value;
 
-        delete value;
-        return nullptr;
-    }
+    throw runtime_error(
+        "Syntax Error: Expected ';' after variable declaration"
+    );
+}
 
     position++;
 
@@ -266,17 +262,27 @@ ASTNode* Parser::parseDeclaration() {
     );
 }
 
-void Parser::expect(const string& value) {
+void Parser::expect(const string& expected) {
 
-    if (position >= tokens.size() ||
-        tokens[position].value != value) {
+    if (position >= tokens.size()) {
+        throw runtime_error(
+            "Syntax Error: Expected '" + expected +
+            "' but reached end of input"
+        );
+    }
 
-        throw runtime_error("Expected '" + value + "'");
+    if (tokens[position].value != expected) {
+        throw runtime_error(
+            "Syntax Error at token " +
+            to_string(position + 1) +
+            ": Expected '" + expected +
+            "' but found '" +
+            tokens[position].value + "'"
+        );
     }
 
     position++;
 }
-
 ASTNode* Parser::parseCondition() {
 
     // Parse left expression
