@@ -6,15 +6,17 @@
 #include <vector>
 
 using namespace std;
-
+class SymbolTable;
 class ASTNode {
 public:
     virtual void print(int indent = 0) = 0;
+    virtual void checkSemantics(SymbolTable& symbols) = 0;
     virtual ~ASTNode() {}
 };
 
 class NumberNode : public ASTNode {
 public:
+	void checkSemantics(SymbolTable& symbols) override;
     int value;
 
     NumberNode(int value);
@@ -23,6 +25,7 @@ public:
 
 class BinaryNode : public ASTNode {
 public:
+	void checkSemantics(SymbolTable& symbols) override;
     string op;
     ASTNode* left;
     ASTNode* right;
@@ -34,6 +37,7 @@ public:
 
 class VariableDeclarationNode : public ASTNode {
 public:
+	void checkSemantics(SymbolTable& symbols) override;
     string type;
     string name;
     ASTNode* value;
@@ -51,6 +55,7 @@ public:
 // New for Day 15
 class ProgramNode : public ASTNode {
 public:
+	void checkSemantics(SymbolTable& symbols) override;
     vector<ASTNode*> statements;
 
     void addStatement(ASTNode* statement);
@@ -59,6 +64,7 @@ public:
 };
 class IdentifierNode : public ASTNode {
 public:
+	void checkSemantics(SymbolTable& symbols) override;
     string name;
 
     IdentifierNode(string name);
@@ -68,6 +74,7 @@ public:
 
 class AssignmentNode : public ASTNode {
 public:
+	void checkSemantics(SymbolTable& symbols) override;
     string name;
     ASTNode* expression;
 
@@ -86,6 +93,7 @@ private:
     ProgramNode* elseBody;
 
 public:
+	void checkSemantics(SymbolTable& symbols) override;
     IfNode(ASTNode* condition,
            ProgramNode* body,
            ProgramNode* elseBody = nullptr);
@@ -98,7 +106,7 @@ class WhileNode : public ASTNode {
 public:
     ASTNode* condition;
     ProgramNode* body;
-
+void checkSemantics(SymbolTable& symbols) override;
     WhileNode(ASTNode* condition, ProgramNode* body);
 
     void print(int indent = 0) override;

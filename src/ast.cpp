@@ -1,3 +1,4 @@
+#include "symbol_table.h"
 #include "ast.h"
 
 NumberNode::NumberNode(int value) {
@@ -166,4 +167,57 @@ void WhileNode::print(int indent) {
 WhileNode::~WhileNode() {
     delete condition;
     delete body;
+}
+void NumberNode::checkSemantics(SymbolTable& symbols) {
+    // Numbers don't require variable checking
+}
+
+void IdentifierNode::checkSemantics(SymbolTable& symbols) {
+    symbols.checkVariable(name);
+}
+void BinaryNode::checkSemantics(SymbolTable& symbols) {
+    left->checkSemantics(symbols);
+    right->checkSemantics(symbols);
+}
+void VariableDeclarationNode::checkSemantics(SymbolTable& symbols) {
+
+    if (value != nullptr) {
+        value->checkSemantics(symbols);
+    }
+
+    symbols.declareVariable(name, type);
+}
+void AssignmentNode::checkSemantics(SymbolTable& symbols) {
+
+    symbols.checkVariable(name);
+
+    if (expression != nullptr) {
+        expression->checkSemantics(symbols);
+    }
+}
+void ProgramNode::checkSemantics(SymbolTable& symbols) {
+
+    for (ASTNode* statement : statements) {
+        statement->checkSemantics(symbols);
+    }
+}
+void IfNode::checkSemantics(SymbolTable& symbols) {
+
+    condition->checkSemantics(symbols);
+
+    if (body != nullptr) {
+        body->checkSemantics(symbols);
+    }
+
+    if (elseBody != nullptr) {
+        elseBody->checkSemantics(symbols);
+    }
+}
+void WhileNode::checkSemantics(SymbolTable& symbols) {
+
+    condition->checkSemantics(symbols);
+
+    if (body != nullptr) {
+        body->checkSemantics(symbols);
+    }
 }
