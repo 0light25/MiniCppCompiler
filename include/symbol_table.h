@@ -5,21 +5,24 @@
 #include <string>
 #include <unordered_map>
 
-using namespace std;
-
 class SymbolTable {
-
 private:
-    unordered_map<string, string> symbols;
+    std::unordered_map<std::string, std::string> symbols;
+
+    // Link to the outer scope
+    SymbolTable* parent;
 
 public:
-    void declareVariable(string name, string type);
+    explicit SymbolTable(SymbolTable* parent = nullptr);
 
-    bool isDeclared(string name) const;
+    void declareVariable(const std::string& name,
+                         const std::string& type);
 
-    void checkVariable(string name) const;
+    bool isDeclared(const std::string& name) const;
 
-    string getType(string name) const;
+    void checkVariable(const std::string& name) const;
+
+    std::string getType(const std::string& name) const;
 };
 
 #endif

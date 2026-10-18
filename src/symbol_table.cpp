@@ -4,30 +4,42 @@
 
 using namespace std;
 
-// Declare a new variable
+// Constructor
+SymbolTable::SymbolTable(SymbolTable* parent)
+    : parent(parent) {}
+
+// Declare a variable in the current scope
 void SymbolTable::declareVariable(
-    string name,
-    string type
+    const string& name,
+    const string& type
 ) {
-    if (isDeclared(name)) {
+    if (symbols.find(name) != symbols.end()) {
         throw runtime_error(
-            "Semantic Error: Variable '" +
-            name + "' already declared"
+            "Semantic Error: Variable '" + name +
+            "' already declared in this scope"
         );
     }
 
     symbols[name] = type;
 }
 
-// Check whether variable exists
-bool SymbolTable::isDeclared(string name) const {
+// Search current scope, then parent scopes
+bool SymbolTable::isDeclared(const string& name) const {
+    if (symbols.find(name) != symbols.end()) {
+        return true;
+    }
 
-    return symbols.find(name) != symbols.end();
+    if (parent != nullptr) {
+        return parent->isDeclared(name);
+    }
+
+    return false;
 }
 
-// Report undeclared variables
-void SymbolTable::checkVariable(string name) const {
-
+// Check whether a variable is accessible
+void SymbolTable::checkVariable(
+    const string& name
+) const {
     if (!isDeclared(name)) {
         throw runtime_error(
             "Semantic Error: Undeclared variable '" +
@@ -36,11 +48,23 @@ void SymbolTable::checkVariable(string name) const {
     }
 }
 
-// Get variable type
-string SymbolTable::getType(string name) const {
+// Get the type of a variable
+string SymbolTable::getType(
+    const string& name
+) const {
+    auto it = symbols.find(name);
 
-    checkVariable(name);
+    if (it != symbols.end()) {
+        return it->second;
+    }
 
-    return symbols.at(name);
+    if (parent != nullptr) {
+        return parent->getType(name);
+    }
+
+    throw runtime_error(
+        "Semantic Error: Undeclared variable '" +
+        name + "'"
+    );
 }
 

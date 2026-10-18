@@ -201,23 +201,37 @@ void ProgramNode::checkSemantics(SymbolTable& symbols) {
         statement->checkSemantics(symbols);
     }
 }
+
 void IfNode::checkSemantics(SymbolTable& symbols) {
 
+    // Condition uses the surrounding scope
     condition->checkSemantics(symbols);
 
+    // New scope for the if block
+    SymbolTable thenScope(&symbols);
+
     if (body != nullptr) {
-        body->checkSemantics(symbols);
+        body->checkSemantics(thenScope);
     }
 
+    // Separate scope for the else block
     if (elseBody != nullptr) {
-        elseBody->checkSemantics(symbols);
+        SymbolTable elseScope(&symbols);
+        elseBody->checkSemantics(elseScope);
     }
 }
+
+
 void WhileNode::checkSemantics(SymbolTable& symbols) {
 
+    // Condition uses the outer scope
     condition->checkSemantics(symbols);
 
+    // New scope for the loop body
+    SymbolTable loopScope(&symbols);
+
     if (body != nullptr) {
-        body->checkSemantics(symbols);
+        body->checkSemantics(loopScope);
     }
 }
+
