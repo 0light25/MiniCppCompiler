@@ -1,6 +1,6 @@
 #include "symbol_table.h"
 #include "ast.h"
-
+#include <stdexcept>
 NumberNode::NumberNode(int value) {
     this->value = value;
 }
@@ -176,23 +176,47 @@ void IdentifierNode::checkSemantics(SymbolTable& symbols) {
     symbols.checkVariable(name);
 }
 void BinaryNode::checkSemantics(SymbolTable& symbols) {
-    left->checkSemantics(symbols);
-    right->checkSemantics(symbols);
+ //   left->checkSemantics(symbols);
+  //  right->checkSemantics(symbols);
+      inferType(symbols);
 }
-void VariableDeclarationNode::checkSemantics(SymbolTable& symbols) {
-
+void VariableDeclarationNode::checkSemantics(
+    SymbolTable& symbols
+) {
     if (value != nullptr) {
-        value->checkSemantics(symbols);
+
+        string valueType = value->inferType(symbols);
+
+        if (valueType != type) {
+            throw runtime_error(
+                "Semantic Error: Type mismatch in declaration of '"
+                + name + "'. Expected " + type
+                + ", got " + valueType
+            );
+        }
     }
 
     symbols.declareVariable(name, type);
 }
-void AssignmentNode::checkSemantics(SymbolTable& symbols) {
+void AssignmentNode::checkSemantics(
+    SymbolTable& symbols
+) {
+    string variableType = symbols.getType(name);
 
-    symbols.checkVariable(name);
+    if (expression == nullptr) {
+        throw runtime_error(
+            "Semantic Error: Missing assignment expression"
+        );
+    }
 
-    if (expression != nullptr) {
-        expression->checkSemantics(symbols);
+    string expressionType = expression->inferType(symbols);
+
+    if (variableType != expressionType) {
+        throw runtime_error(
+            "Semantic Error: Type mismatch in assignment to '"
+            + name + "'. Expected " + variableType
+            + ", got " + expressionType
+        );
     }
 }
 void ProgramNode::checkSemantics(SymbolTable& symbols) {
@@ -234,4 +258,63 @@ void WhileNode::checkSemantics(SymbolTable& symbols) {
         body->checkSemantics(loopScope);
     }
 }
+string ASTNode::inferType(SymbolTable& symbols) {
+    throw runtime_error(
+        "Semantic Error: Node is not an expression"
+    );
+}
+string NumberNode::inferType(SymbolTable& symbols) {
+    return "int";
+}
+string IdentifierNode::inferType(SymbolTable& symbols) {
+    return symbols.getType(name);
+}
+string BinaryNode::inferType(SymbolTable& symbols) {
+
+    string leftType = left->inferType(symbols);
+    string rightType = right->inferType(symbols);
+
+    // Arithmetic operators
+    if (op == "+" || op == "-" ||
+        op == "*" || op == "/") {
+
+        if (leftType != "int" || rightType != "int") {
+            throw runtime_error(
+                "Semantic Error: Arithmetic requires int operands"
+            );
+        }
+
+        return "int";
+    }
+
+    // Relational operators
+    if (op == ">" || op == "<" ||
+        op == ">=" || op == "<=") {
+
+        if (leftType != "int" || rightType != "int") {
+            throw runtime_error(
+                "Semantic Error: Comparison requires int operands"
+            );
+        }
+
+        return "bool";
+    }
+
+    // Equality operators
+    if (op == "==" || op == "!=") {
+
+        if (leftType != rightType) {
+            throw runtime_error(
+                "Semantic Error: Incompatible comparison types"
+            );
+        }
+
+        return "bool";
+    }
+
+    throw runtime_error(
+        "Semantic Error: Unsupported binary operator " + op
+    );
+}
+
 

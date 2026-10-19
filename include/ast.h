@@ -11,6 +11,7 @@ class ASTNode {
 public:
     virtual void print(int indent = 0) = 0;
     virtual void checkSemantics(SymbolTable& symbols) = 0;
+    virtual string inferType(SymbolTable& symbols);
     virtual ~ASTNode() {}
 };
 
@@ -21,6 +22,7 @@ public:
 
     NumberNode(int value);
     void print(int indent = 0);
+    string inferType(SymbolTable& symbols) override;
 };
 
 class BinaryNode : public ASTNode {
@@ -32,6 +34,7 @@ public:
 
     BinaryNode(string op, ASTNode* left, ASTNode* right);
     void print(int indent = 0);
+    string inferType(SymbolTable& symbols) override;
     ~BinaryNode();
 };
 
@@ -68,7 +71,7 @@ public:
     string name;
 
     IdentifierNode(string name);
-
+    string inferType(SymbolTable& symbols) override;
     void print(int indent = 0) override;
 };
 
