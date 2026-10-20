@@ -1,6 +1,7 @@
 #include "symbol_table.h"
 #include "ast.h"
 #include <stdexcept>
+using namespace std;
 NumberNode::NumberNode(int value) {
     this->value = value;
 }
@@ -316,5 +317,44 @@ string BinaryNode::inferType(SymbolTable& symbols) {
         "Semantic Error: Unsupported binary operator " + op
     );
 }
+int ASTNode::evaluate() {
+    throw runtime_error(
+        "Evaluation not implemented for this AST node"
+    );
+}
+int NumberNode::evaluate() {
+    return value;
+}
+int BinaryNode::evaluate() {
 
+    int leftValue = left->evaluate();
+    int rightValue = right->evaluate();
+
+    if (op == "+") {
+        return leftValue + rightValue;
+    }
+
+    if (op == "-") {
+        return leftValue - rightValue;
+    }
+
+    if (op == "*") {
+        return leftValue * rightValue;
+    }
+
+    if (op == "/") {
+
+        if (rightValue == 0) {
+            throw runtime_error(
+                "Runtime Error: Division by zero"
+            );
+        }
+
+        return leftValue / rightValue;
+    }
+
+    throw runtime_error(
+        "Unsupported operator: " + op
+    );
+}
 
