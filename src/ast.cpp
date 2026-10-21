@@ -357,4 +357,116 @@ int BinaryNode::evaluate() {
         "Unsupported operator: " + op
     );
 }
+int ASTNode::evaluate(RuntimeVariables& variables) {
+    (void)variables;
+
+    // Use the existing Day 26 evaluator
+    return evaluate();
+}
+int IdentifierNode::evaluate(RuntimeVariables& variables) {
+
+    auto it = variables.find(name);
+
+    if (it == variables.end()) {
+        throw runtime_error(
+            "Runtime Error: Undefined variable '" + name + "'"
+        );
+    }
+
+    return it->second;
+}
+int BinaryNode::evaluate(RuntimeVariables& variables) {
+
+    int leftValue = left->evaluate(variables);
+    int rightValue = right->evaluate(variables);
+
+    if (op == "+")
+        return leftValue + rightValue;
+
+    if (op == "-")
+        return leftValue - rightValue;
+
+    if (op == "*")
+        return leftValue * rightValue;
+
+    if (op == "/") {
+        if (rightValue == 0) {
+            throw runtime_error("Division by zero");
+        }
+
+        return leftValue / rightValue;
+    }
+
+    if (op == "<")
+        return leftValue < rightValue;
+
+    if (op == ">")
+        return leftValue > rightValue;
+
+    if (op == "<=")
+        return leftValue <= rightValue;
+
+    if (op == ">=")
+        return leftValue >= rightValue;
+
+    if (op == "==")
+        return leftValue == rightValue;
+
+    if (op == "!=")
+        return leftValue != rightValue;
+
+    throw runtime_error(
+        "Unsupported binary operator: " + op
+    );
+}
+int VariableDeclarationNode::evaluate(
+    RuntimeVariables& variables
+) {
+
+    if (variables.find(name) != variables.end()) {
+        throw runtime_error(
+            "Variable already declared: " + name
+        );
+    }
+
+    int result = 0;
+
+    if (value != nullptr) {
+        result = value->evaluate(variables);
+    }
+
+    variables[name] = result;
+
+    return result;
+}
+int AssignmentNode::evaluate(
+    RuntimeVariables& variables
+) {
+
+    auto it = variables.find(name);
+
+    if (it == variables.end()) {
+        throw runtime_error(
+            "Assignment to undeclared variable: " + name
+        );
+    }
+
+    int result = expression->evaluate(variables);
+
+    it->second = result;
+
+    return result;
+}
+int ProgramNode::evaluate(
+    RuntimeVariables& variables
+) {
+
+    int result = 0;
+
+    for (ASTNode* statement : statements) {
+        result = statement->evaluate(variables);
+    }
+
+    return result;
+}
 

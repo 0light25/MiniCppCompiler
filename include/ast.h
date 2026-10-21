@@ -1,48 +1,65 @@
+
 #ifndef AST_H
 #define AST_H
 
 #include <iostream>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
-using namespace std;
+using std::string;
+using std::vector;
+
+// Day 27: Runtime variable storage
+using RuntimeVariables = std::unordered_map<std::string, int>;
+
 class SymbolTable;
+
 class ASTNode {
 public:
     virtual void print(int indent = 0) = 0;
     virtual void checkSemantics(SymbolTable& symbols) = 0;
     virtual string inferType(SymbolTable& symbols);
+
     virtual int evaluate();
+    virtual int evaluate(RuntimeVariables& variables);
+
     virtual ~ASTNode() {}
 };
 
 class NumberNode : public ASTNode {
 public:
-	void checkSemantics(SymbolTable& symbols) override;
     int value;
-int evaluate() override;
+
     NumberNode(int value);
-    void print(int indent = 0);
+
+    void print(int indent = 0) override;
+    void checkSemantics(SymbolTable& symbols) override;
     string inferType(SymbolTable& symbols) override;
+
+    int evaluate() override;
 };
 
 class BinaryNode : public ASTNode {
 public:
-	void checkSemantics(SymbolTable& symbols) override;
     string op;
     ASTNode* left;
     ASTNode* right;
 
     BinaryNode(string op, ASTNode* left, ASTNode* right);
-    void print(int indent = 0);
-    int evaluate() override;
+
+    void print(int indent = 0) override;
+    void checkSemantics(SymbolTable& symbols) override;
     string inferType(SymbolTable& symbols) override;
+
+    int evaluate() override;
+    int evaluate(RuntimeVariables& variables) override;
+
     ~BinaryNode();
 };
 
 class VariableDeclarationNode : public ASTNode {
 public:
-	void checkSemantics(SymbolTable& symbols) override;
     string type;
     string name;
     ASTNode* value;
@@ -53,43 +70,55 @@ public:
         ASTNode* value
     );
 
-    void print(int indent = 0);
+    void print(int indent = 0) override;
+    void checkSemantics(SymbolTable& symbols) override;
+
+    int evaluate(RuntimeVariables& variables) override;
+
     ~VariableDeclarationNode();
 };
 
-// New for Day 15
 class ProgramNode : public ASTNode {
 public:
-	void checkSemantics(SymbolTable& symbols) override;
     vector<ASTNode*> statements;
 
     void addStatement(ASTNode* statement);
-    void print(int indent = 0);
+
+    void print(int indent = 0) override;
+    void checkSemantics(SymbolTable& symbols) override;
+
+    int evaluate(RuntimeVariables& variables) override;
+
     ~ProgramNode();
 };
+
 class IdentifierNode : public ASTNode {
 public:
-	void checkSemantics(SymbolTable& symbols) override;
     string name;
 
     IdentifierNode(string name);
-    string inferType(SymbolTable& symbols) override;
+
     void print(int indent = 0) override;
+    void checkSemantics(SymbolTable& symbols) override;
+    string inferType(SymbolTable& symbols) override;
+
+    int evaluate(RuntimeVariables& variables) override;
 };
 
 class AssignmentNode : public ASTNode {
 public:
-	void checkSemantics(SymbolTable& symbols) override;
     string name;
     ASTNode* expression;
 
     AssignmentNode(string name, ASTNode* expression);
 
-    ~AssignmentNode();
-
     void print(int indent = 0) override;
-};
+    void checkSemantics(SymbolTable& symbols) override;
 
+    int evaluate(RuntimeVariables& variables) override;
+
+    ~AssignmentNode();
+};
 
 class IfNode : public ASTNode {
 private:
@@ -98,25 +127,30 @@ private:
     ProgramNode* elseBody;
 
 public:
-	void checkSemantics(SymbolTable& symbols) override;
-    IfNode(ASTNode* condition,
-           ProgramNode* body,
-           ProgramNode* elseBody = nullptr);
-
-    ~IfNode() override;
+    IfNode(
+        ASTNode* condition,
+        ProgramNode* body,
+        ProgramNode* elseBody = nullptr
+    );
 
     void print(int indent = 0) override;
+    void checkSemantics(SymbolTable& symbols) override;
+
+    ~IfNode() override;
 };
+
 class WhileNode : public ASTNode {
 public:
     ASTNode* condition;
     ProgramNode* body;
-void checkSemantics(SymbolTable& symbols) override;
+
     WhileNode(ASTNode* condition, ProgramNode* body);
 
     void print(int indent = 0) override;
+    void checkSemantics(SymbolTable& symbols) override;
 
     ~WhileNode();
 };
+
 #endif
 
