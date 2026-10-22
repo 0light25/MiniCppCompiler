@@ -470,3 +470,33 @@ int ProgramNode::evaluate(
     return result;
 }
 
+int IfNode::evaluate(RuntimeVariables& variables) {
+
+    int conditionValue = condition->evaluate(variables);
+
+    if (conditionValue != 0) {
+
+        if (body != nullptr) {
+            body->evaluate(variables);
+        }
+
+    } else {
+
+        if (elseBody != nullptr) {
+            elseBody->evaluate(variables);
+        }
+    }
+
+    return 0;
+}
+int WhileNode::evaluate(RuntimeVariables& variables) {
+
+    while (condition->evaluate(variables) != 0) {
+
+        if (body != nullptr) {
+            body->evaluate(variables);
+        }
+    }
+
+    return 0;
+}

@@ -135,7 +135,7 @@ public:
 
     void print(int indent = 0) override;
     void checkSemantics(SymbolTable& symbols) override;
-
+int evaluate(RuntimeVariables& variables) override;
     ~IfNode() override;
 };
 
@@ -145,7 +145,7 @@ public:
     ProgramNode* body;
 
     WhileNode(ASTNode* condition, ProgramNode* body);
-
+int evaluate(RuntimeVariables& variables) override;
     void print(int indent = 0) override;
     void checkSemantics(SymbolTable& symbols) override;
 
