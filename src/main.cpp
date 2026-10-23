@@ -1,104 +1,96 @@
-/*
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <memory>
+#include <stdexcept>
+
 #include "lexer.h"
+#include "parser.h"
+#include "ast.h"
+#include "symbol_table.h"
 
 using namespace std;
 
-int main() {
+int main(int argc, char* argv[]) {
 
-    Lexer lexer;
+    // Step 1: Check command-line argument
+    if (argc != 2) {
+        cerr << "Usage: compiler <source_file>" << endl;
+        return 1;
+    }
 
-    string code = R"(
-        int x = 10 + 20;
-        if (x >= 20) {
-            x = x - 5;
+    // Step 2: Read source code
+    ifstream file(argv[1]);
+
+    if (!file.is_open()) {
+        cerr << "Error: Cannot open file: "
+             << argv[1] << endl;
+        return 1;
+    }
+
+    stringstream buffer;
+    buffer << file.rdbuf();
+    string sourceCode = buffer.str();
+
+    try {
+
+        // Step 3: Lexical Analysis
+        Lexer lexer;
+        vector<Token> tokens = lexer.tokenize(sourceCode);
+
+        cout << "Lexical Analysis: PASS" << endl;
+
+        // Step 4: Syntax Analysis
+        Parser parser(tokens);
+
+        unique_ptr<ASTNode> root(parser.parseProgram());
+
+        if (!root) {
+            throw runtime_error("Parsing failed");
         }
-    )";
 
-    vector<Token> tokens = lexer.tokenize(code);
+        cout << "Syntax Analysis: PASS" << endl;
 
-    for (Token token : tokens) {
+        // Step 5: Semantic Analysis
+        SymbolTable symbols;
+        root->checkSemantics(symbols);
 
-        cout << token.value << " : ";
+        cout << "Semantic Analysis: PASS" << endl;
 
-        switch (token.type) {
+        // Step 6: Execute AST
+        RuntimeVariables variables;
+        root->evaluate(variables);
 
-            case KEYWORD:
-                cout << "KEYWORD";
-                break;
+        cout << "Execution: PASS" << endl;
 
-            case IDENTIFIER:
-                cout << "IDENTIFIER";
-                break;
+        // Step 7: Display final values
+        cout << "\nFinal Variable Values:" << endl;
 
-            case NUMBER:
-                cout << "NUMBER";
-                break;
+        vector<string> names;
 
-            case OPERATOR:
-                cout << "OPERATOR";
-                break;
-
-            case SYMBOL:
-                cout << "SYMBOL";
-                break;
-
-            case UNKNOWN:
-                cout << "UNKNOWN";
-                break;
+        for (const auto& item : variables) {
+            names.push_back(item.first);
         }
 
-        cout << endl;
+        sort(names.begin(), names.end());
+
+        for (const string& name : names) {
+            cout << name << " = "
+                 << variables.at(name) << endl;
+        }
+
+        cout << "\nProgram executed successfully!"
+             << endl;
+
+    } catch (const exception& e) {
+
+        cerr << "Error: " << e.what() << endl;
+        return 1;
     }
 
     return 0;
 }
-*/
-/*
-#include <iostream>
-#include "lexer.h"
 
-using namespace std;
-
-int main() {
-
-    string code = "int age = 20; if age return age;";
-
-    Lexer lexer;
-
-    vector<Token> tokens = lexer.tokenize(code);
-
-    for (auto token : tokens) {
-        cout << token.type << " : " << token.value << endl;
-    }
-
-    return 0;
-}
-*/
-#include <iostream>
-#include "lexer.h"
-
-using namespace std;
-
-int main() {
-
-    // Code that OUR lexer will analyze
-    string code = R"(
-        int age = 20;
-//hello world!.==
-        /* this is my comment */
-
-        return age;
-    )";
-
-    Lexer lexer;
-
-    vector<Token> tokens = lexer.tokenize(code);
-
-    for (auto token : tokens) {
-
-        cout << token.type << " : " << token.value << endl;
-    }
-
-    return 0;
-}
