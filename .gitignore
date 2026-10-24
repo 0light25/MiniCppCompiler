@@ -1,4 +1,16 @@
+# Compiled binaries
 *.exe
-compiler
+*.out
 *.o
+*.obj
+
+# Build directories
+build/
+bin/
+
+# Editor settings
 .vscode/
+
+# Temporary files
+*.tmp
+*.log
