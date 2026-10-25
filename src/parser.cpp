@@ -21,6 +21,11 @@ ASTNode* Parser::parseProgram() {
 
     while (position < tokens.size()) {
 
+        // Stop parsing when closing brace is found
+        if (tokens[position].value == "}") {
+            break;
+        }
+
         ASTNode* statement = parseStatement();
 
         program->addStatement(statement);
@@ -28,7 +33,6 @@ ASTNode* Parser::parseProgram() {
 
     return program;
 }
-
 // Parse assignment statement
 // Example: x = x + 5;
 ASTNode* Parser::parseAssignment() {
@@ -456,4 +460,50 @@ ASTNode* Parser::parseWhileStatement() {
     position++;
 
     return new WhileNode(condition, body);
+}
+ASTNode* Parser::parseMainProgram() {
+
+    position = 0;
+
+    // Detect int main() {
+    if (tokens.size() >= 5 &&
+        tokens[0].value == "int" &&
+        tokens[1].value == "main" &&
+        tokens[2].value == "(" &&
+        tokens[3].value == ")" &&
+        tokens[4].value == "{") {
+
+        // Skip: int main() {
+        position = 5;
+
+        // Parse statements inside main
+        ASTNode* program = parseProgram();
+
+        // Expect closing brace
+        if (position >= tokens.size() ||
+            tokens[position].value != "}") {
+
+            delete program;
+
+            throw std::runtime_error(
+                "Expected } at end of main()"
+            );
+        }
+
+        position++;
+
+        if (position != tokens.size()) {
+
+            delete program;
+
+            throw std::runtime_error(
+                "Unexpected tokens after main()"
+            );
+        }
+
+        return program;
+    }
+
+    // Support existing programs without main()
+    return parseProgram();
 }

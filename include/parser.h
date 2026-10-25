@@ -28,7 +28,7 @@ void expect(const string& value);
 public:
 
     Parser(vector<Token> tokens);
-
+ASTNode* parseMainProgram();
     ASTNode* parseDeclaration();
 
     // DAY 15

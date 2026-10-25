@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
         // Step 4: Syntax Analysis
         Parser parser(tokens);
 
-        unique_ptr<ASTNode> root(parser.parseProgram());
+        unique_ptr<ASTNode> root(parser.parseMainProgram());
 
         if (!root) {
             throw runtime_error("Parsing failed");
