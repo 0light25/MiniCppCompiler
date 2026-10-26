@@ -152,5 +152,40 @@ int evaluate(RuntimeVariables& variables) override;
     ~WhileNode();
 };
 
+class CoutNode : public ASTNode {
+public:
+    enum Kind {
+        TEXT,
+        EXPRESSION,
+        NEWLINE
+    };
+
+    struct Item {
+        Kind kind;
+        string text;
+        ASTNode* expression;
+    };
+
+private:
+    vector<Item> items;
+
+public:
+    void addText(const string& text);
+    void addExpression(ASTNode* expression);
+    void addEndl();
+
+    ~CoutNode() override;
+
+    void print(int indent = 0) override;
+
+    void checkSemantics(SymbolTable& symbols) override;
+
+    string inferType(SymbolTable& symbols) override;
+
+    int evaluate() override;
+
+    int evaluate(RuntimeVariables& variables) override;
+};
+
 #endif
 

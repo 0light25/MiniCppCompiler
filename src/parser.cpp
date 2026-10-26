@@ -396,6 +396,11 @@ ASTNode* Parser::parseStatement() {
         return parseWhileStatement();
     }
 
+if (position < tokens.size() &&
+    tokens[position].value == "cout") {
+
+    return parseCoutStatement();
+}
     if (tokens[position].type == IDENTIFIER) {
         return parseAssignment();
     }
@@ -507,3 +512,73 @@ ASTNode* Parser::parseMainProgram() {
     // Support existing programs without main()
     return parseProgram();
 }
+
+ASTNode* Parser::parseCoutStatement() {
+
+    // Skip cout
+    position++;
+
+    CoutNode* node = new CoutNode();
+
+    try {
+        while (true) {
+
+            // Expect <<
+            if (position >= tokens.size() ||
+                tokens[position].value != "<<") {
+                throw runtime_error("Expected << after cout");
+            }
+
+            position++;
+
+            if (position >= tokens.size()) {
+                throw runtime_error("Expected cout expression");
+            }
+
+            // String literal
+            if (tokens[position].type == STRING_LITERAL) {
+
+                node->addText(tokens[position].value);
+                position++;
+            }
+
+            // endl
+            else if (tokens[position].value == "endl") {
+
+                node->addEndl();
+                position++;
+            }
+
+            // Numbers, identifiers and arithmetic
+            else {
+
+                ASTNode* expression = parseExpression();
+                node->addExpression(expression);
+            }
+
+            // Check for another <<
+            if (position < tokens.size() &&
+                tokens[position].value == "<<") {
+                continue;
+            }
+
+            break;
+        }
+
+        // Expect ;
+        if (position >= tokens.size() ||
+            tokens[position].value != ";") {
+
+            throw runtime_error("Expected ; after cout");
+        }
+
+        position++;
+
+        return node;
+
+    } catch (...) {
+        delete node;
+        throw;
+    }
+}
+

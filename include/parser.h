@@ -19,7 +19,7 @@ private:
     ASTNode* parseFactor();
     ASTNode* parseNumber();
 ASTNode* parseCondition();
-
+ASTNode* parseCoutStatement();
 ASTNode* parseIfStatement();
 ASTNode* parseWhileStatement();
 ASTNode* parseStatement();

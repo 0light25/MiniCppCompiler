@@ -500,3 +500,72 @@ int WhileNode::evaluate(RuntimeVariables& variables) {
 
     return 0;
 }
+
+void CoutNode::addText(const string& text) {
+    items.push_back({TEXT, text, nullptr});
+}
+
+void CoutNode::addExpression(ASTNode* expression) {
+    items.push_back({EXPRESSION, "", expression});
+}
+
+void CoutNode::addEndl() {
+    items.push_back({NEWLINE, "", nullptr});
+}
+
+CoutNode::~CoutNode() {
+    for (auto& item : items) {
+        delete item.expression;
+    }
+}
+
+void CoutNode::print(int indent) {
+    cout << string(indent, ' ') << "CoutStatement\n";
+
+    for (auto& item : items) {
+        if (item.kind == TEXT) {
+            cout << string(indent + 2, ' ')
+                 << "String: " << item.text << "\n";
+        }
+        else if (item.kind == NEWLINE) {
+            cout << string(indent + 2, ' ')
+                 << "Endl\n";
+        }
+        else {
+            item.expression->print(indent + 2);
+        }
+    }
+}
+
+void CoutNode::checkSemantics(SymbolTable& symbols) {
+    for (auto& item : items) {
+        if (item.kind == EXPRESSION) {
+            item.expression->checkSemantics(symbols);
+        }
+    }
+}
+
+string CoutNode::inferType(SymbolTable& symbols) {
+    return "void";
+}
+
+int CoutNode::evaluate(RuntimeVariables& variables) {
+    for (auto& item : items) {
+        if (item.kind == TEXT) {
+            cout << item.text;
+        }
+        else if (item.kind == NEWLINE) {
+            cout << '\n';
+        }
+        else {
+            cout << item.expression->evaluate(variables);
+        }
+    }
+
+    return 0;
+}
+
+int CoutNode::evaluate() {
+    RuntimeVariables variables;
+    return evaluate(variables);
+}

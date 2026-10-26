@@ -12,6 +12,7 @@ enum TokenType {
     NUMBER,
     OPERATOR,
     SYMBOL,
+    STRING_LITERAL,
     UNKNOWN
 };
 

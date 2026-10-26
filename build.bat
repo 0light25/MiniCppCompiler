@@ -1,9 +1,8 @@
 @echo off
-setlocal
 
 echo Compiling MiniCppCompiler...
 
-g++ -std=c++11 -Iinclude src/*.cpp -o compiler.exe
+g++ -std=c++11 -Iinclude src/main.cpp src/lexer.cpp src/parser.cpp src/ast.cpp src/symbol_table.cpp -o compiler.exe
 
 if errorlevel 1 (
     echo Compilation failed!
@@ -13,15 +12,13 @@ if errorlevel 1 (
 echo Compilation successful!
 
 if "%~1"=="" (
-    set /p "program=Enter program file path: "
-) else (
-    set "program=%~1"
-)
-
-if not exist "%program%" (
-    echo Error: Program file not found!
+    echo Error: Please provide a program file!
     exit /b 1
 )
 
-echo Running %program%...
-compiler.exe "%program%"
+if not exist "%~1" (
+    echo Error: Program file not found: %~1
+    exit /b 1
+)
+
+compiler.exe "%~1"
